@@ -1,12 +1,14 @@
 package packageTime;
 
 import javax.swing.JOptionPane;
+import java.util.*;
 
 public class JavaTimer extends javax.swing.JFrame {
-private int hh;
-private int mm;
-private int ss;
-    
+private int ss, mm, hh;
+private Timer timer = new Timer();
+private String stringhh, stringmm, stringss;
+private boolean key = false;
+
     public JavaTimer() {
         initComponents();
     }
@@ -16,9 +18,9 @@ private int ss;
     private void initComponents() {
 
         labelTimer = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btTime = new javax.swing.JButton();
         btStart = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        btCro = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -31,7 +33,12 @@ private int ss;
         labelTimer.setFont(new java.awt.Font("Yu Gothic UI Semibold", 0, 36)); // NOI18N
         labelTimer.setText("00:00:00");
 
-        jButton1.setText("RELOJ");
+        btTime.setText("RELOJ");
+        btTime.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btTimeActionPerformed(evt);
+            }
+        });
 
         btStart.setText("EMPEZAR");
         btStart.addActionListener(new java.awt.event.ActionListener() {
@@ -40,7 +47,12 @@ private int ss;
             }
         });
 
-        jButton3.setText("CRONOMETRO");
+        btCro.setText("CRONOMETRO");
+        btCro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btCroActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("HH:");
 
@@ -66,7 +78,7 @@ private int ss;
                         .addGap(120, 120, 120))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btTime, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -84,7 +96,7 @@ private int ss;
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(btStart, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(btCro, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
@@ -105,9 +117,9 @@ private int ss;
                         .addComponent(tfhh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btCro, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btStart, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btTime, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -119,29 +131,132 @@ private int ss;
         mm = Integer.parseInt(tfmm.getText());
         ss = Integer.parseInt(tfss.getText());
         
-        if(hh >= 100 || mm >= 61 || ss >= 61 || hh < 0 || mm < 0 || ss < 0){
+        JavaTimer f3 = new JavaTimer();
+        f3.setVisible(true);
+        
+        if(hh >= 100 || mm >= 61 || ss >= 61 || hh < 0 || mm < 0 || ss < 0 || tfhh.getText() == "" || tfmm.getText() == "" || tfss.getText() == ""){
             hh = 0;
             mm = 0;
             ss = 0;
-            tfhh.setText("");
-            tfmm.setText("");
-            tfss.setText("");
-            
             JOptionPane.showMessageDialog(null, "ERROR");
         }
         
         else{
-            Thread t = new Thread(){
-            @Override
-            public void run(){
-                 for(int i = 0; i < 7000; i++){
-                     System.out.println("hola");
-                 }
-            }
-        };
-            t.start();
+            
+            TimerTask task = new TimerTask(){
+                
+                @Override
+                public void run(){
+                    ss--;
+                    
+                    if(ss == -1 && mm > 0){
+                        mm--;
+                        ss = 59;
+                    }
+
+                    if(ss == 0 && mm == 0 && hh == 0){
+                        timer.cancel();
+                    }
+                    
+                    if(ss == -1 && mm == -1 && hh > 0){
+                        hh--;
+                        ss = 59;
+                        mm = 59;
+                    }
+                    
+                    if(ss < 10 && mm == 0 && hh == 0){
+                        stringss = Integer.toString(ss);
+                        labelTimer.setText("00:00:0" + stringss);
+                    }
+                    
+                    if(ss >= 10 && mm == 0 && hh == 0){
+                        stringss = Integer.toString(ss);
+                        labelTimer.setText("00:00:" + stringss);
+                    }
+                    
+                    if(ss < 10 && mm < 10 && hh == 0){
+                        stringmm = Integer.toString(mm);
+                        stringss = Integer.toString(ss);
+                        labelTimer.setText("00:0" + stringmm + ":0" + stringss);
+                    }
+                    
+                    if(ss >= 10 && mm < 10 && hh == 0){
+                        stringmm = Integer.toString(mm);
+                        stringss = Integer.toString(ss);
+                        labelTimer.setText("00:0" + stringmm + ":" + stringss);
+                    }
+                    
+                    if(ss >= 10 && mm >= 10 && hh == 0){
+                        stringmm = Integer.toString(mm);
+                        stringss = Integer.toString(ss);
+                        labelTimer.setText("00:" + stringmm + ":" + stringss);
+                    }
+                    
+                    if(ss < 10 && mm < 10 && hh < 10){
+                        stringmm = Integer.toString(mm);
+                        stringss = Integer.toString(ss);
+                         stringhh = Integer.toString(hh);
+                        labelTimer.setText("0" + stringhh + ":0"+ stringmm + ":0" + stringss);
+                    }
+                    
+                    if(ss >= 10 && mm < 10 && hh < 10){
+                        stringmm = Integer.toString(mm);
+                        stringss = Integer.toString(ss);
+                         stringhh = Integer.toString(hh);
+                        labelTimer.setText("0" + stringhh + ":0"+ stringmm + ":" + stringss);
+                    }
+                    
+                    if(ss >= 10 && mm >= 10 && hh < 10){
+                        stringmm = Integer.toString(mm);
+                        stringss = Integer.toString(ss);
+                         stringhh = Integer.toString(hh);
+                        labelTimer.setText("0" + stringhh + ":" + stringmm + ":" + stringss);
+                    }
+                    
+                    if(ss >= 10 && mm >= 10 && hh >= 10){
+                        stringmm = Integer.toString(mm);
+                        stringss = Integer.toString(ss);
+                         stringhh = Integer.toString(hh);
+                        labelTimer.setText(stringhh +  ":" + stringmm + ":" + stringss);
+                    }
+                    
+                    if(ss < 10 && mm >= 10 && hh < 10){
+                        stringmm = Integer.toString(mm);
+                        stringss = Integer.toString(ss);
+                         stringhh = Integer.toString(hh);
+                        labelTimer.setText("0" + stringhh + ":" + stringmm + ":0" + stringss);
+                    }
+                    
+                    if(ss < 10 && mm >= 10 && hh >= 10){
+                        stringmm = Integer.toString(mm);
+                        stringss = Integer.toString(ss);
+                         stringhh = Integer.toString(hh);
+                        labelTimer.setText(stringhh + ":" + stringmm + ":0" + stringss);
+                    }
+                    
+                    if(ss >= 10 && mm < 10 && hh >= 10){
+                        stringmm = Integer.toString(mm);
+                        stringss = Integer.toString(ss);
+                         stringhh = Integer.toString(hh);
+                        labelTimer.setText(stringhh + ":0" + stringmm + ":" + stringss);
+                    }
+                }
+            };
+            timer.schedule(task,0,1000);
        }
     }//GEN-LAST:event_btStartActionPerformed
+
+    private void btTimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btTimeActionPerformed
+        JavaTime f2 = new JavaTime();
+        f2.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btTimeActionPerformed
+
+    private void btCroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCroActionPerformed
+        javaChronometer f2 = new javaChronometer();
+        f2.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btCroActionPerformed
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -152,9 +267,9 @@ private int ss;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btCro;
     private javax.swing.JButton btStart;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton btTime;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
